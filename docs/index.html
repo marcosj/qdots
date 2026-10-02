@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>QEC Code Noise Models</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;800&display=swap" rel="stylesheet">
+	<style>
+		.reveal { font-family: 'Inter', sans-serif; background-color: #0b0f19; }
+		.reveal h1, .reveal h2, .reveal h3 { font-family: 'Inter', sans-serif; font-weight: 800; text-transform: none; color: #38bdf8; }
+		.reveal code { font-family: 'Fira Code', monospace; color: #f43f5e; }
+	</style>
+</head>
+<body>
+
+	<div class="reveal">
+		<div class="slides">
+
+			<section>
+				<h2>Clifford deformed codes tailored to quantum dot noise</h2>
+				<h5 style="text-align: right;">Marcos Jiménez</h5>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Noise profiles
+						* Code capacity
+						* Phenomenological noise
+						* Circuit level noise
+						* Quantum dot noise
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Code capacity
+						* 1 round
+						* Depolarizing noise on data qubits before the round
+
+						![](img/cap.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Phenomenological noise
+						* d rounds
+						* Depolarizing noise on data qubits before every round
+						* Z/X error before measurements
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Circuit level noise
+						* d rounds
+						* Z/X error before measurements
+						* Z/X error after resets
+						* Depolarizing noise after every gate
+
+						![](img/0dn.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Quantum dot noise
+						* d rounds
+						* Code capacity noise +
+						* Circuit level noise +
+						* Z errors on idle qubits
+						![](img/real.png)
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Surface Code
+						![](img/sc.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						![](img/sc_cg_codcap.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						![](img/sc_cg_depnoi.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						![](img/sc_cg_phenoi.png)
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Unrotated surface code memory X
+						![](img/rnd.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### Code Capacity Noise Model
+						![](img/2sccc.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### Circuit Level Noise
+						<img src="../out/png/sc_cz_cl_th.png" width="500">
+						<img src="../out/png/sc_cz_cl_fi.png" width="500">
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### Quantum dot noise
+						<img src="img/2rnth.png" width="500">
+						<img src="img/2ckf2.png" width="500">
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## XZZX Surface code
+						![](img/xzb.png)
+						-> r rounds ->
+						![](img/xza.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## p_th vs bias
+						![](img/bias.png)
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## XZZX Surface code
+						![](img/xzb.png)
+						-> r rounds ->
+						![](img/xza.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Bacon-Shor
+						* bul1
+						* bul2
+
+						![](img/sc.png)
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Bacon-Shor
+						![](img/bs.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Code capacity
+						<img src="../out/png/bs_cz_cc_th.png" width="700">
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Phenomenological noise
+						<img src="../out/png/bs_cz_pn_th.png" width="500">
+						<img src="../out/png/bs_cz_pn_fi.png" width="500">
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Circuit level noise
+						<img src="../out/png/bs_cz_cl_th.png" width="500">
+						<img src="../out/png/bs_cz_cl_fi.png" width="500">
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## Simulation time
+						- SC: 90s
+						- BS: 30s
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Bacon-Shor
+						![](img/rnd.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## title
+						* bul1
+						* bul2
+
+						![](img/rnd.png)
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Deformed Bacon-Shor
+						![](img/xzb.png)
+						-> r rounds ->
+						![](img/xza.png)
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						## title
+						* bul1
+						* bul2
+
+						![](img/xza.png)
+					</textarea>
+				</section>
+			</section>
+
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/markdown/markdown.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
+	<script>
+		Reveal.initialize({
+			width: 1050,
+			height: 700,
+			history: true, // Allows browser back/forward buttons to navigate slides
+			plugins: [ RevealMarkdown, RevealMath.MathJax3 ]
+		});
+	</script>
+
+</body>
+</html>
