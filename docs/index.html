@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>QEC Code Noise Models</title>
+	<title>QEC codes tailored to quantum dot noise</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
 	<link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;800&display=swap" rel="stylesheet">
@@ -10,6 +10,88 @@
 		.reveal { font-family: 'Inter', sans-serif; background-color: #0b0f19; }
 		.reveal h1, .reveal h2, .reveal h3 { font-family: 'Inter', sans-serif; font-weight: 800; text-transform: none; color: #38bdf8; }
 		.reveal code { font-family: 'Fira Code', monospace; color: #f43f5e; }
+		.reveal h1 { font-size: 2.1em; }
+		.reveal h2 { font-size: 1.7em; /* Default is usually over 2.1em */ }
+		.reveal h3 {
+  font-size: 1.3em; /* Shrinks the text down comfortably */
+  margin: 5px; /* Shaves off extra bottom space to free up room for content */
+}
+		.reveal p, .reveal ul {
+			font-size: 0.8em; /* Shrinks body text slightly */
+			line-height: 1.1;
+			text-align: left;
+			margin-bottom: 0.4em;
+			margin-top: 0;
+			display: block !important;
+		}
+		/* Container to sit images side-by-side */
+		.reveal .image-row {
+		  display: flex;
+		  justify-content: center;
+		  gap: 20px; /* Space between the images */
+		  margin-top: 10px;
+		}
+
+		/* Global rule to constrain portrait images within the row */
+		.reveal .image-row img {
+		  width: auto;
+		  max-width: 48%;    /* Prevents them from crowding each other horizontally */
+		  max-height: 68vh;  /* Crucial for portrait: keeps them from spilling off the bottom */
+		  object-fit: contain;
+		}
+		.reveal .controls {
+  transform: scale(0.7);          /* Scales down the entire arrow bundle (Default is 1.0) */
+  transform-origin: bottom right; /* Ensures they stay pinned cleanly to the bottom right corner */
+  bottom: 12px;                   /* Optional: brings them slightly tighter into the corner */
+  right: 12px;
+}
+/* Expand the presentation's active container bounds */
+.reveal:not(.overview) .slides section {
+  padding: 5 !important;      /* Removes default slide-level padding */
+  top: 0 !important;
+  transform: none !important;
+}
+
+/* Force the core scaling container to take up more screen real estate */
+.reveal:not(.overview) .slides {
+  width: 85% !important;      /* Maximizes horizontal workspace (Default is narrower) */
+  height: 90% !important;     /* Maximizes vertical workspace */
+}
+/* Keep ONLY the very first slide vertically centered */
+.reveal:not(.overview) .slides > section:first-of-type {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+/* Alternative: Styled colored checkmarks */
+.reveal ul {
+  list-style-type: none !important; /* Hides the default dot completely */
+  margin-left: 0.5em !important;    /* Tights up the indentation */
+}
+
+.reveal ul li::before {
+  content: "✓";                     /* Injects the checkmark */
+  color: #2ecc71;                   /* Make it a clean green (or your theme accent color) */
+  font-weight: bold;
+  display: inline-block;
+  width: 1.2em;                     /* Fixed spacing before the text starts */
+  margin-left: -1.2em;              /* Pulls the checkmark back into the gutter */
+}
+/* Move slide numbers to the bottom-left corner */
+.reveal .slide-number {
+  left: 20px !important;
+  right: auto !important;
+  bottom: 20px !important;
+  font-size: 0.55em !important; /* Optional: drops size to match your cleaner layout */
+}
+@media print {
+  .reveal.print-pdf .slides section .columns,
+  .reveal.print-pdf .slides section [style*="display: flex"] {
+    display: flex !important;
+    flex-direction: row !important;
+  }
+}
 	</style>
 </head>
 <body>
@@ -23,6 +105,188 @@
 			</section>
 
 			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Objetivo 1
+						Simular el código de superficie tradicional (de tipo CSS) y el código de Bacon-Shor tradicional (de tipo CSS) bajo ruido despolarizador (simétrico, no sesgado) a nivel de circuito.
+
+						Esto se hará como un "chequeo de sanidad" para reproducir resultados previos de la literatura.
+
+						Esto se hara para códigos de distancia d = 3, 5, 7, 9.
+
+						Se cuantificarán dos resultados:
+						* Tasa de error lógico (tasa de fallo) después de una ronda de corrección de errores, en función de p
+						* Decaimiento de la fidelidad lógica en función del número de rondas de corrección de errores.
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### Rotated surface code memory Z
+						<div class="image-row">
+						<img src="img/sc_th.png">
+						<img src="img/sc_fi.png">
+						</div>
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### Rotated surface code memory X
+						<div class="image-row">
+						<img src="img/sc_th.png">
+						<img src="img/sc_fi.png">
+						</div>
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### Bacon-Shor code memory Z
+						<div class="image-row">
+						<img src="img/bs_th.png">
+						<img src="img/bs_fi.png">
+						</div>
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Objetivo 2
+						Simular el código de superficie XZZX con ruido a nivel de capacidad de código (code capacity; corrección perfecta) bajo varios valores de sesgo.
+
+						Esto también corresponde a un "chequeo de sanidad".
+
+						Se cuantificarán dos resultados:
+						* Tasa de error lógico (tasa de fallo)
+						* Umbral en función del sesgo.
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### XZZX code memory Z
+						<div class="image-row">
+						<img src="img/xz_e1.png">
+						<img src="img/xz_eta.png">
+						</div>
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### XZZX code memory X
+						<div class="image-row">
+						<img src="img/xz_e1.png">
+						<img src="img/xz_eta.png">
+						</div>
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Objetivo 3
+						Simular el código de Bacon-Shor XZZX con ruido a nivel de capacidad de código (code capacity; corrección perfecta) bajo varios valores de sesgo.
+
+						Estos resultados no han sido reportados en la literatura.
+
+						Se cuantificarán dos resultados:
+						* Tasa de error lógico (tasa de fallo)
+						* Umbral en función del sesgo.
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### Bacon-Shor XZZX code memory Z
+						<div class="image-row">
+						<img src="img/bs_e1.png">
+						<img src="img/bs_eta.png">
+						</div>
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Objetivo 4
+						Simular el código de superficie XZZX con el modelo de ruido puntos cuánticos a nivel de circuito .
+
+						Se tomarán los parámetros de ruido del estado del arte de los cúbits de spin en puntos cuánticos y se adaptarán al simulador Stim.
+
+						Esto se hará para códigos de superficie de distancia d = 3, 5, 7, 9.
+
+						Estos resultados no han sido reportados en la literatura.
+
+						Se cuantificarán dos resultados:
+						* Tasa de error lógico (tasa de fallo) después de una ronda de corrección de errores, en función de p
+						* Decaimiento de la fidelidad lógica en función del número de rondas de corrección de errores.
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### XZZX code memory Z
+						<div class="image-row">
+						<img src="img/xz_qd_th.png">
+						<img src="img/xz_qd_fi.png">
+						</div>
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### XZZX code memory X
+						<div class="image-row">
+						<img src="img/xz_qd_th.png">
+						<img src="img/xz_qd_fi.png">
+						</div>
+					</textarea>
+				</section>
+			</section>
+
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Objetivo 5
+						Simular el código de Bacon-Shor XZZX con el modelo de ruido puntos cuánticos a nivel de circuito .
+
+						Se tomarán los parámetros de ruido del estado del arte de los cúbits de spin en puntos cuánticos y se adaptarán al simulador Stim.
+
+						Esto se hará para códigos de superficie de distancia d = 3, 5, 7, 9.
+
+						Estos resultados no han sido reportados en la literatura.
+
+						Se cuantificarán dos resultados:
+						* Tasa de error lógico (tasa de fallo) después de una ronda de corrección de errores, en función de p
+						* Decaimiento de la fidelidad lógica en función del número de rondas de corrección de errores.
+					</textarea>
+				</section>
+
+				<section data-markdown>
+					<textarea data-template>
+						### Bacon-Shor XZZX code memory Z
+						<div class="image-row">
+						<img src="img/bs_qd_th.png">
+						<img src="img/bs_qd_fi.png">
+						</div>
+					</textarea>
+				</section>
+			</section>
+
+<!--
+			<section>
+				<section data-markdown>
+					<textarea data-template>
+						## Fin
+					</textarea>
+				</section>
+
 				<section data-markdown>
 					<textarea data-template>
 						## Noise profiles
@@ -253,7 +517,7 @@
 					</textarea>
 				</section>
 			</section>
-
+-->
 		</div>
 	</div>
 
@@ -265,6 +529,8 @@
 			width: 1050,
 			height: 700,
 			history: true, // Allows browser back/forward buttons to navigate slides
+			slideNumber: 'c/t',
+			defaultTiming: 120,
 			plugins: [ RevealMarkdown, RevealMath.MathJax3 ]
 		});
 	</script>

@@ -1,3 +1,9 @@
+# Capture everything after the target
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+
+# Force Make to ignore the extra "targets"
+$(eval $(RUN_ARGS):;@:)
+
 .PHONY: run clean cleanout help test-noi test-sim test-viz
 
 # Default target when you just type 'make'
@@ -12,7 +18,7 @@ help:
 
 # Run the project pipeline
 run:
-	python src/main.py
+	python src/main.py $(RUN_ARGS)
 
 # Clean Python compilation bloat
 clean:
@@ -23,6 +29,7 @@ clean:
 cleanout:
 	rm -f out/csv/*.csv
 	rm -f out/png/*.png
+	rm -f out/tmp/*.png
 
 test-noi:
 	python -m src.noi.add_noise
@@ -32,3 +39,9 @@ test-sim:
 
 test-viz:
 	python -m src.viz.viz
+
+GENERATORS = bs_mz sc_unr_mx xzzx_rot_mz sc_rot_mx sc_unr_mz sc_rot_mz xzzx_rot_mx bs_xz_mz
+
+$(foreach gen,$(GENERATORS), \
+    $(eval test-$(gen): ; python -m src.gen.gen_$(gen)) \
+)

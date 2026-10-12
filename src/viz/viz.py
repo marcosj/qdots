@@ -100,7 +100,7 @@ def plot(stats, sweep='p', title='Surface Code Performance', legend_title='d', p
 
     # --- Plot Aesthetics ---
     ax.set_yscale('log')
-    ax.set_title(title)
+    if title: ax.set_title(title)
     ax.set_ylabel('Logical Error Rate per Shot')
 
     ax.grid(visible=True, which='major', linestyle='-', linewidth=0.7)
@@ -131,6 +131,14 @@ def entropy_gap(p, eta):
     # 1 - Shannon entropy
     return 1.0 + np.sum(probs * np.log2(probs))
 
+
+'''
+p_{h.b.} is the root of
+1 - H(p_I,p_x,p_y,p_z) = 0
+Shannon entropy: H(p) = -sum p_i lg p_i
+1 + p_I lg p_I + 2 p_x lg p_x + p_z lg p_z = 0
+1 + (1 - p) lg(1 - p) + p / (η + 1) lg p / 2(η + 1) + ηp / (η + 1) lg ηp / (η + 1) = 0
+'''
 def hashing_bound(etas):
     # Computes p_hb for each eta in etas
     p_hb = []

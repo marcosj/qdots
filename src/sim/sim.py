@@ -6,21 +6,24 @@ import numpy as np
 import stim
 import sinter
 
-def gen_tasks(gen, dists, probs, rounds, rnd=False, rst=False, gate=False, meas=False, eta=None, mem='x'):
+def gen_tasks(circgen, dists, probs, rounds, dq, aq, rnd=False, rst=False, gate=False, meas=False, eta=None, mem='x'):
     # Noiseless circuits
     less = {}
     for d in dists:
         for r in rounds:
-            less[(d, r)] = gen(d, r).flattened()
+            less[(d, r)] = circgen(d, r).flattened()
 
     # Noisy circuits
     for (d, r), circ in less.items():
         for p in probs:
-            ro = p if rnd else 0
-            re = p if rst else 0
-            ga = p if gate else 0
-            me = p if meas else 0
-            noisy = add_noise(circ, ro, re, ga, me, eta, mem)
+            if dq:
+                noisy = qdot(circ, dq, aq, eta)
+            else:
+                ro = p if rnd else 0
+                re = p if rst else 0
+                ga = p if gate else 0
+                me = p if meas else 0
+                noisy = add_noise(circ, ro, re, ga, me, eta, mem)
             yield sinter.Task(
                 circuit=noisy,
                 json_metadata={
@@ -34,7 +37,7 @@ def sim(tasks, fname, shots=50_000, max_errors=200, cores=4, clear_history=False
 
     t = time.time()
     '''tasks = gen_tasks(
-        gen=gen,
+        circgen=circgen,
         dists=dists,
         probs=probs,
         rounds=rounds,

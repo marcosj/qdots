@@ -7,35 +7,26 @@ def coord(d, qi):
     dq, xa, za = [], [], []
     coords = {}
 
-    # Data qubits are simple: odd/odd pairs
-    for y in range(1, D, 2):
-        for x in range(1, D, 2):
-            i = qi(x, y, D)
-            dq.append(i)
-            c.append('QUBIT_COORDS', i, [x, y])
-            coords[i] = [x, y]
+    # Data Qubits
+    dq = list(range(d*d))
+    for q in dq:
+        row, col = divmod(q, d)
+        c.append('QUBIT_COORDS', [q], [2*col, 2*row])
+        coords[q] = [2*col, 2*row]
 
-    # Z-Ancillas: Both x and y are EVEN, and (x + y) % 4 == 0
-    for y in range(0, D + 1, 2):
-        for x in range(0, D + 1, 2):
-            if (x + y) % 4 == 0:
-                # Excludes the horizontal boundary lines (y=0 and y=D)
-                if 0 < y < D:
-                    i = qi(x, y, D)
-                    za.append(i)
-                    c.append('QUBIT_COORDS', i, [x, y])
-                    coords[i] = [x, y]
+    # ZZ Ancillas
+    za = list(range(d*d, d*d + d*(d-1)))
+    for i in range(len(za)):
+        row, col = divmod(i, d)
+        c.append('QUBIT_COORDS', [za[i]], [2*col, 2*row+1])
+        coords[za[i]] = [2*col, 2*row+1]
 
-    # X-Ancillas: Both x and y are EVEN, and (x + y) % 4 == 2
-    for y in range(0, D + 1, 2):
-        for x in range(0, D + 1, 2):
-            if (x + y) % 4 == 2:
-                # Excludes the vertical boundary lines (x=0 and x=D)
-                if 0 < x < D:
-                    i = qi(x, y, D)
-                    xa.append(i)
-                    c.append('QUBIT_COORDS', i, [x, y])
-                    coords[i] = [x, y]
+    # XX Ancillas
+    xa = list(range(d*d + d*(d-1), d*d + 2*d*(d-1)))
+    for i in range(len(xa)):
+        row, col = divmod(i, d-1)
+        c.append('QUBIT_COORDS', [xa[i]], [2*col+1, 2*row])
+        coords[xa[i]] = [2*col+1, 2*row]
 
     return c, dq, xa, za, coords
 
@@ -44,83 +35,79 @@ def prep(dq, xa, za):
     # prepares data qubits in |0>_L
     c.append('R', dq)
     c.append('TICK')
-    c.append('R', xa + za)
+    c.append('R', za + xa)
     c.append('TICK')
     return c
 
 def round(d, dq, xa, za, coords, off, qi):
     c = stim.Circuit()
-    c.append("H", xa)
-    c.append("TICK")
 
-    D = 2 * d
-    for (xdx, xdy), (zdx, zdy) in off:
-        cz_targets = []
+    # X gauges
+    c.append('H', xa)
+    c.append('TICK')
+    for i in range(len(xa)):
+        c.append('CNOT', [xa[i], i + i // (d-1)])
+    c.append('TICK')
+    for i in range(len(xa)):
+        c.append('CNOT', [xa[i], i+1 + i // (d-1)])
+    c.append('TICK')
+    c.append('H', xa)
+    c.append('TICK')
+    c.append('MR', xa)
+    c.append('TICK')
 
-        # X-ancillas: Control = X-ancilla, Target = Data qubit at offset
-        for a in xa:
-            ax, ay = coords[a]
-            trgt = qi(ax + xdx, ay + xdy, D)
-            if trgt in dq:
-                cz_targets.extend([a, trgt])
+    # Z gauges
+    for i in range(len(za)):
+        c.append('CNOT', [i, za[i]])
+    c.append('TICK')
+    for i in range(len(za)):
+        c.append('CNOT', [i+d, za[i]])
+    c.append('TICK')
+    c.append('MR', za)
+    c.append('TICK')
 
-        # Z-ancillas: Control = Data qubit at offset, Target = Z-ancilla
-        for a in za:
-            ax, ay = coords[a]
-            ctrl = qi(ax + zdx, ay + zdy, D)
-            if ctrl in dq:
-                cz_targets.extend([ctrl, a])
-
-        c.append("CX", cz_targets)
-        c.append("TICK")
-
-    c.append("H", xa)
-    c.append("TICK")
-
-    c.append("MR", xa + za)
+    #c.append("MR", xa + za)
     return c
 
-def detect(r, xa, za, coords):
+def detect(d, r, xa, za, coords):
     c = stim.Circuit()
-    aq = xa + za
-    na = len(aq)
-
-    if r == 0:
-        for i, a in enumerate(za):
-            c.append("DETECTOR", [stim.target_rec(-len(za)+i)], coords[a]+[0])
-    else:
+    if r > 0:
         c.append("SHIFT_COORDS", [], [0, 0, 1])
-        for i, a in enumerate(aq):
-            rec = -na + i
-            prev = rec - na
-            c.append("DETECTOR", [stim.target_rec(rec), stim.target_rec(prev)], coords[a]+[0])
+
+    # X stabilizers
+    for col in range(d-1):
+        gauge = [col + row*(d-1) for row in range(d)]
+        meas = [stim.target_rec(-len(xa) - len(za) + i) for i in gauge]
+        if r > 0:
+            prev = [stim.target_rec(-(2*len(xa)+2*len(za)) + i) for i in gauge]
+            c.append('DETECTOR', meas + prev, [2*col+1, 0, 0])
+
+    # Z stabilizers
+    for row in range(d-1):
+        gauge = [row*d + col for col in range(d)]
+        meas = [stim.target_rec(-len(za) + i) for i in gauge]
+        if r > 0:
+            prev = [stim.target_rec(-(2*len(za)+len(xa)) + i) for i in gauge]
+            c.append('DETECTOR', meas + prev, [0, 2*row+1, 0])
+        else:
+            c.append('DETECTOR', meas, [0, 2*row+1, 0])
+
     c.append("TICK")
     return c
 
 def meas(d, r, dq, xa, za, coords, off, qi):
     c = stim.Circuit()
     c.append('M', dq)
-    D = 2 * d
-    na, nd = len(xa) + len(za), len(dq)
-    # Compare Z-measurements against the Z-ancillas
-    for i, q in enumerate(za):
-        x, y = coords[q]
-        rec = []
-        for (dx, dy), _ in off:
-            tx, ty = x + dx, y + dy
-            if 0 <= tx < D and 0 <= ty < D:
-                rec.append(stim.target_rec(-nd + dq.index(qi(tx, ty, D))))
-        j = za.index(q)
-        rec.append(stim.target_rec(-nd - len(za) + j))
-        c.append('DETECTOR', rec, [x, y, r])
-
-    # Logical Z runs horinzontally
-    zL = [qi(x, 1, D) for x in range(1, D, 2)]
-    rec = [stim.target_rec(-nd + dq.index(q)) for q in zL]
-    c.append('OBSERVABLE_INCLUDE', rec, 0)
+    for i in range(len(za)):
+        row, col = divmod(i, d)
+        meas = [stim.target_rec(-(len(dq)+len(za)) + i)]
+        prev = [stim.target_rec(-len(dq) + i), stim.target_rec(-len(dq) + i+d)]
+        c.append('DETECTOR', meas + prev, [2*col, 2*row+1, r])
+    Z_L = [stim.target_rec(-d*d + i) for i in range(d)]
+    c.append('OBSERVABLE_INCLUDE', Z_L, 0)
     return c
 
-def gen_sc_rot_mz(d, r):
+def gen_bs_mz(d, r):
     qi = lambda x, y, D: x + (D + 1) * (y // 2)
     off = [
         ((+1, +1), (+1, +1)), # NE
@@ -128,20 +115,21 @@ def gen_sc_rot_mz(d, r):
         ((+1, -1), (-1, +1)), # SE
         ((-1, -1), (-1, -1))  # SW
     ]
-    C, dq, xa, za = coord(d)
+    C, dq, xa, za, coords = coord(d, qi)
     P = prep(dq, xa, za)
-    R = round(d, dq, xa, za)
-    D0 = detect(0, xa, za)
-    Di = detect(r, xa, za)
+    R = round(d, dq, xa, za, coords, off, qi)
+    D0 = detect(d, 0, xa, za, coords)
+    Di = detect(d, r, xa, za, coords)
     Ri = R + Di
-    M = meas(d, r, dq, xa, za)
+    M = meas(d, r, dq, xa, za, coords, off, qi)
     return C + P + R + D0 + Ri * (r-1) + M
 
 if __name__ == '__main__':
-    sc = gen_sc_rot_mz(5, 1)
-    sc.to_file("d5ours.stim")
-    dem = sc.detector_error_model(decompose_errors=True)
+    from ..conf import TMP_DIR
+    c = gen_bs_mz(3, 1)
+    c.to_file(TMP_DIR / "bs3.stim")
+    dem = c.detector_error_model(decompose_errors=True)
     #print('dem\n', dem)
-    svg = sc.diagram('detslice-with-ops-svg')
-    with open("rzcx.svg", "w") as f:
+    svg = c.diagram('timeslice-svg') # detslice-with-ops
+    with open(TMP_DIR / "bs3.svg", "w") as f:
         f.write(str(svg))
