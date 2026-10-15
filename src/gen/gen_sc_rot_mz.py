@@ -113,6 +113,7 @@ def meas(d, r, dq, xa, za, coords, off, qi):
         j = za.index(q)
         rec.append(stim.target_rec(-nd - len(za) + j))
         c.append('DETECTOR', rec, [x, y, r])
+    #print(f'{d=} {r=}')
 
     # Logical Z runs horinzontally
     zL = [qi(x, 1, D) for x in range(1, D, 2)]
@@ -128,13 +129,13 @@ def gen_sc_rot_mz(d, r):
         ((+1, -1), (-1, +1)), # SE
         ((-1, -1), (-1, -1))  # SW
     ]
-    C, dq, xa, za = coord(d)
+    C, dq, xa, za, coords = coord(d, qi)
     P = prep(dq, xa, za)
-    R = round(d, dq, xa, za)
-    D0 = detect(0, xa, za)
-    Di = detect(r, xa, za)
+    R = round(d, dq, xa, za, coords, off, qi)
+    D0 = detect(0, xa, za, coords)
+    Di = detect(r, xa, za, coords)
     Ri = R + Di
-    M = meas(d, r, dq, xa, za)
+    M = meas(d, r, dq, xa, za, coords, off, qi)
     return C + P + R + D0 + Ri * (r-1) + M
 
 if __name__ == '__main__':

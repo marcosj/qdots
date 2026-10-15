@@ -31,28 +31,34 @@ def plot(stats, sweep='p', title='Surface Code Performance', legend_title='d', p
             stats=stats,
             x_func=lambda s: s.json_metadata['p'],
             group_func=lambda s: s.json_metadata['d'],
-            failure_units_per_shot_func=lambda s: s.json_metadata['r']
+            #failure_units_per_shot_func=lambda s: s.json_metadata['r']
         )
         ax.set_xscale('log')
         ax.set_xlabel('Physical Error Rate, p')
 
         # --- Automatic Threshold Crossing Calculation ---
-        # 1. Aggregate logical error rates per shot from stats
-        grid = {}
+        # 1. Accumulate total errors and shots per (p, d)
+        agg_grid = {}
         p_vals = set()
         d_vals = set()
 
         for s in stats:
             p = s.json_metadata['p']
             d = s.json_metadata['d']
-            r = s.json_metadata.get('r', 1)
 
             p_vals.add(p)
             d_vals.add(d)
 
-            # Match Sinter's per-shot error rate scaling
-            ler_per_shot = (s.errors / s.shots) / r if s.shots > 0 else 0
-            grid[(p, d)] = ler_per_shot
+            key = (p, d)
+            if key not in agg_grid:
+                agg_grid[key] = {'errors': 0, 'shots': 0}
+            agg_grid[key]['errors'] += s.errors
+            agg_grid[key]['shots'] += s.shots
+
+        # Compute circuit-level logical error rate per shot (matching plot)
+        grid = {}
+        for (p, d), data in agg_grid.items():
+            grid[(p, d)] = data['errors'] / data['shots'] if data['shots'] > 0 else 0
 
         # 2. Linear interpolation across min(d) and max(d)
         sorted_p = sorted(p_vals)
@@ -77,7 +83,7 @@ def plot(stats, sweep='p', title='Surface Code Performance', legend_title='d', p
             color='black',
             linestyle='--',
             linewidth=1.5,
-            label=f'$p_{{th}} \\approx$ {p_th:.1%}'
+            label=f'$p_{{th}} \\approx$ {p_th:.2%}'
         )
 
     elif sweep == 'r':
@@ -87,7 +93,7 @@ def plot(stats, sweep='p', title='Surface Code Performance', legend_title='d', p
             stats=stats,
             x_func=lambda s: s.json_metadata['r'],
             group_func=lambda s: s.json_metadata['d'],
-            failure_units_per_shot_func=lambda s: s.json_metadata['r']
+            #failure_units_per_shot_func=lambda s: s.json_metadata['r']
         )
         ax.set_xlabel('Rounds')
         # Dynamic ticks based on integer round data found in metadata

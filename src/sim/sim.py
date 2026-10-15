@@ -1,4 +1,5 @@
-from noi.add_noise import add_noise
+from noi.add_noise import add_noise, qdot
+from conf import TMP_DIR
 #from mwpf import SinterMWPFDecoder
 import time
 import os
@@ -6,12 +7,18 @@ import numpy as np
 import stim
 import sinter
 
-def gen_tasks(circgen, dists, probs, rounds, dq, aq, rnd=False, rst=False, gate=False, meas=False, eta=None, mem='x'):
+def gen_tasks(circgen, dists, probs, rounds, dq, aq, rnd=False, rst=False, gate=False, meas=False, eta=None, mem='x', debug=False):
     # Noiseless circuits
     less = {}
     for d in dists:
-        for r in rounds:
-            less[(d, r)] = circgen(d, r).flattened()
+        if rounds == '1':
+          rlist = [1]
+        elif rounds == 'd':
+          rlist = [d]
+        elif rounds == '2d':
+          rlist = list(range(1, 2 * dists[-1] + 1))
+        for r in rlist:
+            less[(d, r)] = circgen(d, r)    #.flattened()
 
     # Noisy circuits
     for (d, r), circ in less.items():
@@ -24,6 +31,9 @@ def gen_tasks(circgen, dists, probs, rounds, dq, aq, rnd=False, rst=False, gate=
                 ga = p if gate else 0
                 me = p if meas else 0
                 noisy = add_noise(circ, ro, re, ga, me, eta, mem)
+            if debug:
+                path = TMP_DIR / f'noisy_d{d}_r{r}_p{p:.5f}.stim'
+                noisy.to_file(path)
             yield sinter.Task(
                 circuit=noisy,
                 json_metadata={
@@ -31,7 +41,7 @@ def gen_tasks(circgen, dists, probs, rounds, dq, aq, rnd=False, rst=False, gate=
                 },
             )
 
-def sim(tasks, fname, shots=50_000, max_errors=200, cores=4, clear_history=False):
+def sim(tasks, fname, shots=100_000, max_errors=500, cores=4, clear_history=False):
     if clear_history and os.path.exists(fname):
         os.remove(fname)
 
