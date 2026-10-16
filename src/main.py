@@ -54,7 +54,7 @@ CSS High-Bias ($\eta \to \infty$)   $\approx 10.9\%$        $\approx 10.8\%$    
 '''
 def main():
     codcap = { 'rounds': '1', 'rnd': True }
-    cirlev = { 'rst': True, 'gate': True, 'meas': True, 'debug': False }
+    cirlev = { 'rst': True, 'gate': True, 'meas': True, 'debug': True }
     d9 = { 'di': 3, 'df': 9, 'ds': 2 }
     d25 = { 'di': 13, 'df': 25, 'ds': 4 }
     d37 = { 'di': 25, 'df': 37, 'ds': 4 }
@@ -62,7 +62,7 @@ def main():
     sczcc = { 'gen': gen_sc_rot_mz, **d9, **codcap }
     scxcl = { 'gen': gen_sc_rot_mx, **d9, **cirlev }
     scxcc = { 'gen': gen_sc_rot_mx, **d9, **codcap }
-    bszcl = { 'gen': gen_bs_mz, **d9, **cirlev, 'shots': 10**6, 'errors': 2000 }
+    bszcl = { 'gen': gen_bs_mz, **d9, **cirlev, 'shots': 10**4, 'errors': 500 }
     bszcc = { 'gen': gen_bs_mz, **d9, **codcap }
     xzzcl = { 'gen': gen_xzzx_rot_mz, **d9, **cirlev }
     xzzcc = { 'gen': gen_xzzx_rot_mz, **d9, **codcap }
@@ -105,9 +105,10 @@ def main():
         'bsz30': { **bszcc, 'pi': .9, 'pf': 4, 'eta': 30, 'mem': 'z', 'fname': 'bsz_e30', 'title': 'Bacon-Shor code capacity (η=30)' },
         'bsz100': { **bszcc, 'pi': .9, 'pf': 4, 'eta': 100, 'mem': 'z', 'fname': 'bsz_e100', 'title': 'Bacon-Shor code capacity (η=100)' },
         'xzzth': { **xzzcl, 'pi': .05, 'pf': .2, 'fname': 'xzz_th', 'title': 'XZZX threshold circuit level noise' },
-        'xzqth': { **xzzcl, 'pi': .05, 'pf': .2, 'fname': 'xzq_th', 'title': 'XZZX threshold real noise' },
+        'xzqth': { **xzzcl, 'pi': .05, 'pf': .2, 'dq': ld, 'aq': st, 'fname': 'xzq_th', 'title': 'XZZX threshold real noise' },
+        'scqth': { **sczcl, 'pi': .4, 'pf': 1, 'dq': ld, 'aq': st, 'fname': 'scq_th', 'title': 'SC memZ threshold real noise' },
         'xzzfi': { **xzzcl, 'pi': .9, 'rounds': '2d', 'sweep': 'r', 'dq': ld, 'aq': st, 'fname': 'xzz_fi', 'title': 'XZZX fidelity real noise' },
-        'zxzth': { **bszcl, 'pi': .1, 'pf': .5, 'dq': ld, 'aq': st, 'fname': 'zxz_th', 'title': 'XZZX Bacon-Shor threshold real noise' },
+        'zxzth': { **bszcl, 'pi': 6, 'pf': 45, 'dq': ld, 'aq': st, 'fname': 'zxz_th', 'title': 'XZZX Bacon-Shor threshold real noise' },
         'zxzfi': { **bszcl, 'pi': .15, 'rounds': '2d', 'sweep': 'r', 'dq': ld, 'aq': st, 'fname': 'zxz_fi', 'title': 'XZZX Bacon-Shor fidelity real noise' },
     }
     #run(Args(**xp[sys.argv[1]]))

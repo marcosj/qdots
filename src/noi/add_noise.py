@@ -14,6 +14,7 @@ def add_noise(circ, round=0, reset=0, gate=0, meas=0, eta=None, mem='x'):
     #coords = circ.get_final_qubit_coordinates()
 
     for op in flat:
+        #if op.name in ['MR', 'M', 'MX', 'R', 'RX', 'H', 'CX']:
         trgts = op.targets_copy()
 
         # pre-op noise
@@ -97,6 +98,7 @@ def qdot(circ, ld, st, eta=None):
     pira = p(ld['tr'], st['t2'])  # aq idling while data measures
 
     for op in flat:
+        #if op.name in ['MR', 'M', 'MX', 'R', 'RX', 'H', 'CX']:
         trgts = op.targets_copy()
         trgtn = {t.value for t in trgts if t.is_qubit_target}
 
@@ -104,13 +106,12 @@ def qdot(circ, ld, st, eta=None):
         match op.name:
             case 'MR':
                 noisy.append('X_ERROR', trgts, st['pr'])
-                noisy.append('Z_ERROR', allq - trgtn, pird)
             case 'M':
                 noisy.append('X_ERROR', trgts, ld['pr'])
-                noisy.append('Z_ERROR', allq - trgtn, pira)
+                #noisy.append('Z_ERROR', allq - trgtn, pira)
             case 'MX':
                 noisy.append('Z_ERROR', trgts, ld['pr'])
-                noisy.append('Z_ERROR', allq - trgtn, pira)
+                #noisy.append('Z_ERROR', allq - trgtn, pira)
 
         noisy.append(op)
 
@@ -119,19 +120,22 @@ def qdot(circ, ld, st, eta=None):
             case 'RX':
                 noisy.append('Z_ERROR', trgts, ld['pp'])
             case 'R':
-                noisy.append('X_ERROR', [q for q in trgtn if q in dq], ld['pp'])
-                noisy.append('X_ERROR', [q for q in trgtn if q in aq], st['pp'])
+                if dq & trgtn: noisy.append('X_ERROR', [q for q in trgtn if q in dq], ld['pp'])
+                if aq & trgtn: noisy.append('X_ERROR', [q for q in trgtn if q in aq], st['pp'])
             case 'MR':
                 noisy.append('X_ERROR', trgts, st['pp'])
+                noisy.append('TICK')
+                noisy.append('Z_ERROR', allq - trgtn, pird)
 
             case 'SQRT_Y' | 'SQRT_Y_DAG' | 'H':
-                noisy.append('Y_ERROR', [q for q in trgtn if q in dq], ld['p1q'])
+                if dq & trgtn: noisy.append('Y_ERROR', [q for q in trgtn if q in dq], ld['p1q'])
                 noisy.append('Y_ERROR', [q for q in trgtn if q in aq], st['p1q'])
 
             case 'CZ' | 'CX':
                 for i in range(0, len(trgts), 2):
                     noisy.append('PAULI_CHANNEL_2', [trgts[i], trgts[i+1]],
-                                 [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0, ld['p2q']])
+                                 [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0, max(ld['p2q'], st['p2q'])])
+                noisy.append('TICK')
                 idle = allq - trgtn
                 noisy.append('Z_ERROR', [q for q in idle if q in dq], pidq)
                 noisy.append('Z_ERROR', [q for q in idle if q in aq], piaq)
