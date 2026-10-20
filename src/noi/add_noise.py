@@ -1,6 +1,16 @@
 import stim
 from math import exp
 
+def pauli(p, eta=None):
+    # Bias factors
+    fx = fy = 1 / (2 * (1 + eta)) if eta else 1/3
+    fz = eta / (1 + eta) if eta else 1/3
+
+    p_x = p * fx
+    p_y = p * fy
+    p_z = p * fz
+    return p_x, p_y, p_z
+
 def add_noise(circ, round=0, reset=0, gate=0, meas=0, eta=None, mem='x'):
     noisy = stim.Circuit()
     flat = circ.flattened()
@@ -85,6 +95,10 @@ def qdot(circ, ld, st, eta=None):
     # Ancilla qubits (aq)
     aq = allq - dq
 
+    # Bias
+    fx = fy = 1 / (2 * (1 + eta)) if eta else 1
+    fz = eta / (1 + eta) if eta else 1
+
     # Idle noise probabilities based on Gaussian decay model: p = 0.5 * (1 - exp(-(t/t2)^2))
     p = lambda t, t2: 0.5 * (1.0 - exp(- (t / t2) ** 2))
 
@@ -105,40 +119,44 @@ def qdot(circ, ld, st, eta=None):
         # Pre-op noise (Readout errors)
         match op.name:
             case 'MR':
-                noisy.append('X_ERROR', trgts, st['pr'])
+                noisy.append('X_ERROR', trgts, fx*st['pr'])
+                noisy.append('TICK')
             case 'M':
-                noisy.append('X_ERROR', trgts, ld['pr'])
+                noisy.append('X_ERROR', trgts, fx*ld['pr'])
                 #noisy.append('Z_ERROR', allq - trgtn, pira)
+                noisy.append('TICK')
             case 'MX':
-                noisy.append('Z_ERROR', trgts, ld['pr'])
+                noisy.append('Z_ERROR', trgts, fz*ld['pr'])
                 #noisy.append('Z_ERROR', allq - trgtn, pira)
+                noisy.append('TICK')
 
         noisy.append(op)
 
         # Post-op noise (Resets, Gates, idles)
         match op.name:
             case 'RX':
-                noisy.append('Z_ERROR', trgts, ld['pp'])
+                noisy.append('Z_ERROR', trgts, fz*ld['pp'])
             case 'R':
-                if dq & trgtn: noisy.append('X_ERROR', [q for q in trgtn if q in dq], ld['pp'])
-                if aq & trgtn: noisy.append('X_ERROR', [q for q in trgtn if q in aq], st['pp'])
+                if dq & trgtn: noisy.append('X_ERROR', [q for q in trgtn if q in dq], fx*ld['pp'])
+                if aq & trgtn: noisy.append('X_ERROR', [q for q in trgtn if q in aq], fx*st['pp'])
             case 'MR':
-                noisy.append('X_ERROR', trgts, st['pp'])
+                noisy.append('X_ERROR', trgts, fx*st['pp'])
                 noisy.append('TICK')
-                noisy.append('Z_ERROR', allq - trgtn, pird)
+                noisy.append('Z_ERROR', allq - trgtn, fz*pird)
 
             case 'SQRT_Y' | 'SQRT_Y_DAG' | 'H':
-                if dq & trgtn: noisy.append('Y_ERROR', [q for q in trgtn if q in dq], ld['p1q'])
-                noisy.append('Y_ERROR', [q for q in trgtn if q in aq], st['p1q'])
+                if dq & trgtn: noisy.append('Y_ERROR', [q for q in trgtn if q in dq], fy*ld['p1q'])
+                noisy.append('Y_ERROR', [q for q in trgtn if q in aq], fy*st['p1q'])
 
             case 'CZ' | 'CX':
                 for i in range(0, len(trgts), 2):
                     noisy.append('PAULI_CHANNEL_2', [trgts[i], trgts[i+1]],
-                                 [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0, max(ld['p2q'], st['p2q'])])
+                                 [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0, fz*max(ld['p2q'], st['p2q'])])
                 noisy.append('TICK')
                 idle = allq - trgtn
-                noisy.append('Z_ERROR', [q for q in idle if q in dq], pidq)
-                noisy.append('Z_ERROR', [q for q in idle if q in aq], piaq)
+                noisy.append('Z_ERROR', [q for q in idle if q in dq], fz*pidq)
+                noisy.append('TICK')
+                noisy.append('Z_ERROR', [q for q in idle if q in aq], fz*piaq)
 
     return noisy
 

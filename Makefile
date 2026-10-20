@@ -40,7 +40,7 @@ test-sim:
 test-viz:
 	python -m src.viz.viz
 
-GENERATORS = bs_mz sc_unr_mx xzzx_rot_mz sc_rot_mx sc_unr_mz sc_rot_mz xzzx_rot_mx bs_xz_mz
+GENERATORS = sc_unr_mx xzzx_rot_mz sc_rot_mx sc_unr_mz sc_rot_mz xzzx_rot_mx bs_mz bs_mx bs_xz_mz
 
 $(foreach gen,$(GENERATORS), \
     $(eval test-$(gen): ; python -m src.gen.gen_$(gen)) \

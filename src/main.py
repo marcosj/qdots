@@ -39,7 +39,8 @@ def run(a: Args):
     d = list(range(a.di, a.df + 1, a.ds))
     p = np.geomspace(a.pi, a.pf, a.ps) / 100 if a.pf else [a.pi / 100]
     #r = [a.rounds] if a.rounds else [*range(1, 2 * a.df + 1)]
-    tasks = gen_tasks(a.gen, d, p, a.rounds, a.dq, a.aq, a.rnd, a.rst, a.gate, a.meas, a.eta, a.mem, a.debug)
+    eta = a.eta if isinstance(a.eta, list) else [a.eta]
+    tasks = gen_tasks(a.gen, d, p, a.rounds, a.dq, a.aq, a.rnd, a.rst, a.gate, a.meas, eta, a.mem, a.debug)
     csv = CSV_DIR / f'{a.fname}.csv'
     stats = sim(tasks, csv, shots=a.shots, max_errors=a.errors, clear_history=a.reset)
     png = PNG_DIR / f'{a.fname}.png'
@@ -54,7 +55,7 @@ CSS High-Bias ($\eta \to \infty$)   $\approx 10.9\%$        $\approx 10.8\%$    
 '''
 def main():
     codcap = { 'rounds': '1', 'rnd': True }
-    cirlev = { 'rst': True, 'gate': True, 'meas': True, 'debug': True }
+    cirlev = { 'rst': True, 'gate': True, 'meas': True, 'debug': False }
     d9 = { 'di': 3, 'df': 9, 'ds': 2 }
     d25 = { 'di': 13, 'df': 25, 'ds': 4 }
     d37 = { 'di': 25, 'df': 37, 'ds': 4 }
@@ -62,11 +63,11 @@ def main():
     sczcc = { 'gen': gen_sc_rot_mz, **d9, **codcap }
     scxcl = { 'gen': gen_sc_rot_mx, **d9, **cirlev }
     scxcc = { 'gen': gen_sc_rot_mx, **d9, **codcap }
-    bszcl = { 'gen': gen_bs_mz, **d9, **cirlev, 'shots': 10**4, 'errors': 500 }
+    bszcl = { 'gen': gen_bs_mz, **d9, **cirlev, 'shots': 10**7, 'errors': 4000 }
     bszcc = { 'gen': gen_bs_mz, **d9, **codcap }
     xzzcl = { 'gen': gen_xzzx_rot_mz, **d9, **cirlev }
     xzzcc = { 'gen': gen_xzzx_rot_mz, **d9, **codcap }
-    xzxcl = { 'gen': gen_xzzx_rot_mx, **d9, **cirlev, 'shots': 10**4, 'errors': 500 }
+    xzxcl = { 'gen': gen_xzzx_rot_mx, **d9, **cirlev, 'shots': 10**6, 'errors': 2000 }
     xzxcc = { 'gen': gen_xzzx_rot_mx, **d9, **codcap }
     xp = {
         'sczth': { **sczcl, 'pi': .5, 'pf': 2, 'fname': 'scz_th', 'title': 'Surface code memZ circuit level threshold' },
@@ -106,8 +107,12 @@ def main():
         'bsz100': { **bszcc, 'pi': .9, 'pf': 4, 'eta': 100, 'mem': 'z', 'fname': 'bsz_e100', 'title': 'Bacon-Shor code capacity (η=100)' },
         'xzzth': { **xzzcl, 'pi': .05, 'pf': .2, 'fname': 'xzz_th', 'title': 'XZZX threshold circuit level noise' },
         'xzqth': { **xzzcl, 'pi': .05, 'pf': .2, 'dq': ld, 'aq': st, 'fname': 'xzq_th', 'title': 'XZZX threshold real noise' },
-        'scqth': { **sczcl, 'pi': .4, 'pf': 1, 'dq': ld, 'aq': st, 'fname': 'scq_th', 'title': 'SC memZ threshold real noise' },
-        'xzzfi': { **xzzcl, 'pi': .9, 'rounds': '2d', 'sweep': 'r', 'dq': ld, 'aq': st, 'fname': 'xzz_fi', 'title': 'XZZX fidelity real noise' },
+        'scqth': { **scxcl, 'pi': .4, 'pf': 1, 'dq': ld, 'aq': st, 'fname': 'scq_th', 'title': 'SC memX threshold real noise' },
+        'xzzfi': { **xzzcl, 'pi': .001, 'rounds': '2d', 'sweep': 'r', 'dq': ld, 'aq': st, 'fname': 'xzz_fi', 'title': 'XZZX fidelity real noise' },
+        'xzxfi': { **xzxcl, 'pi': .01, 'rounds': '2d', 'sweep': 'r', 'dq': ld, 'aq': st, 'fname': 'xzx_fi', 'title': 'XZZX fidelity real noise' },
+        'xzxbi': { **xzxcl, 'sweep': 'eta', 'eta': [.5, 1, 3, 10, 30], 'dq': ld, 'aq': st, 'fname': 'xzx_bi', 'title': 'XZZX memX real noise' },
+        'xzzbi': { **xzzcl, 'sweep': 'eta', 'eta': [.5, 1, 3, 10, 30], 'dq': ld, 'aq': st, 'fname': 'xzz_bi', 'title': 'XZZX memZ real noise' },
+        'zxzbi': { **bszcl, 'sweep': 'eta', 'eta': [.5, 1, 3, 10, 30], 'dq': ld, 'aq': st, 'fname': 'zxz_bi', 'title': 'B-S real noise' },
         'zxzth': { **bszcl, 'pi': 6, 'pf': 45, 'dq': ld, 'aq': st, 'fname': 'zxz_th', 'title': 'XZZX Bacon-Shor threshold real noise' },
         'zxzfi': { **bszcl, 'pi': .15, 'rounds': '2d', 'sweep': 'r', 'dq': ld, 'aq': st, 'fname': 'zxz_fi', 'title': 'XZZX Bacon-Shor fidelity real noise' },
     }

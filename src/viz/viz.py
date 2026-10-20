@@ -35,6 +35,7 @@ def plot(stats, sweep='p', title='Surface Code Performance', legend_title='d', p
         )
         ax.set_xscale('log')
         ax.set_xlabel('Physical Error Rate, p')
+        ax.set_ylabel(r'Logical Error Rate, $p_L$')
 
         # --- Automatic Threshold Crossing Calculation ---
         # 1. Accumulate total errors and shots per (p, d)
@@ -96,18 +97,35 @@ def plot(stats, sweep='p', title='Surface Code Performance', legend_title='d', p
             #failure_units_per_shot_func=lambda s: s.json_metadata['r']
         )
         ax.set_xlabel('Rounds')
+        ax.set_ylabel('Logical Error Rate')
         # Dynamic ticks based on integer round data found in metadata
         r_vals = {s.json_metadata['r'] for s in stats if 'r' in s.json_metadata}
         if r_vals:
             ax.set_xticks(sorted(list(r_vals)))
 
+    elif sweep == 'eta':
+        # --- Plot Style 3: Sweep Noise Bias (eta) ---
+        sinter.plot_error_rate(
+            ax=ax,
+            stats=stats,
+            x_func=lambda s: s.json_metadata['eta'],
+            group_func=lambda s: s.json_metadata['d'],
+        )
+        ax.set_xlabel(r'Noise Bias ($\eta$)')
+        ax.set_ylabel('Logical Fidelity ($1 - p_L$)')
+        ax.set_xscale('log')
+        ax.invert_yaxis()
+
+        # Dynamic ticks for numerical eta values found in metadata
+        eta_vals = {s.json_metadata['eta'] for s in stats}
+        if None not in eta_vals:
+            ax.set_xticks(sorted(list(eta_vals)))
     else:
-        raise ValueError("sweep_type must be either 'p' (physical error rate) or 'r' (rounds).")
+        raise ValueError('Unknown sweep_type.')
 
     # --- Plot Aesthetics ---
     ax.set_yscale('log')
     if title: ax.set_title(title)
-    ax.set_ylabel('Logical Error Rate per Shot')
 
     ax.grid(visible=True, which='major', linestyle='-', linewidth=0.7)
     ax.grid(visible=True, which='minor', linestyle=':', linewidth=0.5)
@@ -121,6 +139,16 @@ def plot(stats, sweep='p', title='Surface Code Performance', legend_title='d', p
         plt.close(fig)
 
     return p_th     # fig, ax
+
+'''for d in sorted({s.json_metadata['d'] for s in stats}):
+    d_stats = [s for s in stats if s.json_metadata['d'] == d]
+    # Sort by eta or p depending on sweep
+    d_stats.sort(key=lambda s: s.json_metadata['eta'])
+
+    etas = [s.json_metadata['eta'] for s in d_stats]
+    fidelities = [1 - (s.errors / s.shots) for s in d_stats]
+
+    ax.plot(etas, fidelities, marker='o', label=f'd = {d}')'''
 
 def entropy_gap(p, eta):
     # Calculates 1 - H(p_I, p_x, p_y, p_z) for a given error rate p and bias eta.

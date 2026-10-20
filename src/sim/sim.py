@@ -7,7 +7,7 @@ import numpy as np
 import stim
 import sinter
 
-def gen_tasks(circgen, dists, probs, rounds, dq, aq, rnd=False, rst=False, gate=False, meas=False, eta=None, mem='x', debug=False):
+def gen_tasks(circgen, dists, probs, rounds, dq, aq, rnd=False, rst=False, gate=False, meas=False, etas=None, mem='x', debug=False):
     # Noiseless circuits
     less = {}
     for d in dists:
@@ -22,24 +22,25 @@ def gen_tasks(circgen, dists, probs, rounds, dq, aq, rnd=False, rst=False, gate=
 
     # Noisy circuits
     for (d, r), circ in less.items():
-        for p in probs:
-            if dq:
-                noisy = qdot(circ, dq, aq, eta)
-            else:
-                ro = p if rnd else 0
-                re = p if rst else 0
-                ga = p if gate else 0
-                me = p if meas else 0
-                noisy = add_noise(circ, ro, re, ga, me, eta, mem)
-            if debug:
-                path = TMP_DIR / f'noisy_d{d}_r{r}_p{p:.5f}.stim'
-                noisy.to_file(path)
-            yield sinter.Task(
-                circuit=noisy,
-                json_metadata={
-                    'd': d, 'r': r, 'p': float(p)
-                },
-            )
+        for eta in etas:
+            for p in probs:
+                if dq:
+                    noisy = qdot(circ, dq, aq, eta)
+                else:
+                    ro = p if rnd else 0
+                    re = p if rst else 0
+                    ga = p if gate else 0
+                    me = p if meas else 0
+                    noisy = add_noise(circ, ro, re, ga, me, eta, mem)
+                if debug:
+                    path = TMP_DIR / f'noisy_d{d}_r{r}_p{p:.5f}.stim'
+                    noisy.to_file(path)
+                yield sinter.Task(
+                    circuit=noisy,
+                    json_metadata={
+                        'd': d, 'r': r, 'p': float(p), 'eta': eta
+                    },
+                )
 
 def sim(tasks, fname, shots=100_000, max_errors=500, cores=4, clear_history=False):
     if clear_history and os.path.exists(fname):
