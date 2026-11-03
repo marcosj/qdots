@@ -119,11 +119,11 @@
     <h3>XZZX code</h3>
     <div class="lay">
         <div class="trk vertical">
-            <input type="radio" name="p1" class="s1" checked>
-            <input type="radio" name="p1" class="s2">
-            <input type="radio" name="p1" class="s3">
-            <input type="radio" name="p1" class="s4">
-            <input type="radio" name="p1" class="s5">
+            <input type="radio" name="p2" class="s1" checked>
+            <input type="radio" name="p2" class="s2">
+            <input type="radio" name="p2" class="s3">
+            <input type="radio" name="p2" class="s4">
+            <input type="radio" name="p2" class="s5">
         </div>
         <div class="col">
             <img class="top1" src="img/xzx_e0.svg">
@@ -161,11 +161,11 @@
     <h3>Bacon-Shor ZXXZ</h3>
     <div class="lay">
         <div class="trk vertical">
-            <input type="radio" name="p1" class="s1" checked>
-            <input type="radio" name="p1" class="s2">
-            <input type="radio" name="p1" class="s3">
-            <input type="radio" name="p1" class="s4">
-            <input type="radio" name="p1" class="s5">
+            <input type="radio" name="p3" class="s1" checked>
+            <input type="radio" name="p3" class="s2">
+            <input type="radio" name="p3" class="s3">
+            <input type="radio" name="p3" class="s4">
+            <input type="radio" name="p3" class="s5">
         </div>
         <div class="col">
             <img class="top1" src="img/zxz_e0.svg">
@@ -266,13 +266,13 @@
             history: true,
             slideNumber: 'c/t',
             defaultTiming: 120,
-            plugins: [ RevealMarkdown, RevealMath.MathJax3 ]
+            plugins: [ RevealMarkdown, RevealMath.MathJax3 ],
+            keyboardCondition: function(event) {
+                return !(document.activeElement.tagName === 'INPUT' ||
+                         document.activeElement.tagName === 'SELECT' ||
+                         document.activeElement.tagName === 'TEXTAREA');
+            }
         });
-        keyboardCondition: function(event) {
-            return !(document.activeElement.tagName === 'INPUT' ||
-                     document.activeElement.tagName === 'SELECT' ||
-                     document.activeElement.tagName === 'TEXTAREA');
-        }
     </script>
 </body>
 </html>
