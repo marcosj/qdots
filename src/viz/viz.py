@@ -134,7 +134,7 @@ def plot(stats, sweep='p', title='Surface Code Performance', legend_title='d', p
     fig.tight_layout()
 
     if path:
-        fig.savefig(path, dpi=300)
+        fig.savefig(path, bbox_inches='tight')
         print(f"Plot saved to: {path}")
         plt.close(fig)
 
@@ -182,18 +182,17 @@ def hashing_bound(etas):
         p_hb.append(sol)
     return np.array(p_hb)
 
-def bias(eta, css, xzzx, path):
+def bias(xy, path):
     etas = np.logspace(np.log10(0.5), np.log10(1000), 100)
     p_hb = hashing_bound(etas)
     plt.semilogx(etas, p_hb, 'k-', linewidth=1.25, label='$p_{h.b.}$')
-    plt.semilogx(eta, css, 'ro:', label='CSS')
-    plt.semilogx(eta, xzzx, 'bo:', label='XZZX')
+    plt.semilogx(xy[0][0], xy[0][1], 'ro:', label='CSS')
+    plt.semilogx(xy[1][0], xy[1][1], 'bo:', label='XZZX')
     plt.grid(True, which="both", ls="--", alpha=0.5)
     plt.xlabel(r'Bias: $\eta$')
     plt.ylabel('Treshold error rate: $p_c$')
     plt.legend(loc='best')
-    plt.savefig(path, dpi=300)
-    #plt.show()
+    plt.savefig(path, bbox_inches='tight')
     plt.close()
 
 if __name__ == '__main__':

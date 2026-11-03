@@ -46,7 +46,7 @@ def prep(dq, xa, za):
     c.append('TICK')
     c.append('R', xa + za)
     c.append('TICK')
-    c.append('H', dq[::2])
+    c.append('H', dq[1::2])
     c.append('TICK')
     return c
 
@@ -105,7 +105,7 @@ def detect(r, xa, za, coords):
 
 def meas(d, r, dq, xa, za, coords, off, qi):
     c = stim.Circuit()
-    c.append('H', dq[::2])
+    c.append('H', dq[1::2])
     c.append('TICK')
     c.append('M', dq)
     D = 2 * d
