@@ -2,8 +2,6 @@
 
 A high-performance Python simulation framework engineered to benchmark and compare **Quantum Error-Correcting (QEC) codes** under realistic, biased physical noise models typical of **semiconductor spin qubits** (quantum dot architectures).
 
----
-
 ## 🔬 Core Scientific Objective
 
 The flagship goal of this repository is to rigorously compare standard CSS codes against their **XZZX-deformed variants** to determine logical error rates versus syndrome extraction rounds ($P_L$ vs. rounds), compute fault-tolerant thresholds, and evaluate performance advantages under highly asymmetric (biased) noise.
@@ -14,13 +12,9 @@ The flagship goal of this repository is to rigorously compare standard CSS codes
 - **XZZX Surface Codes**
 - **Color Codes** (To do)
 
----
-
-📊 Research Context & Status
+## 📊 Research Context & Status
 
 Developed as part of my thesis and as advanced research into quantum error correction performance scaling for semiconductor spin qubits, in collaboration with UCR and NTHU. Designed to generate reproducible benchmarking data for threshold estimation and hardware-tailored decoder design.
-
----
 
 ## 🏛️ Framework Architecture
 
@@ -29,15 +23,15 @@ Beyond individual code benchmarks, `qdots` functions as a robust, easily configu
 ```text
  ┌─────────────────────────────────────────────────────────┐
  │               Configuration & Parameters                │
- │    (Code Topology, Noise Bias η, Error Rates p, Rounds)   │
+ │    (Code Topology, Noise Bias η, Error Rates p, Rounds) │
  └────────────────────────────┬────────────────────────────┘
                               ▼
  ┌─────────────────────────────────────────────────────────┐
  │                   Simulation Pipeline                   │
- │  ┌─────────────────┐   ┌───────────────┐   ┌─────────┐  │
- │  │ Circuit Gen     │ → │ Noise Injection│ → │ Stim    │  │
- │  │ (Topologies)    │   │ (QDot Biased) │   │ Engine  │  │
- │  └─────────────────┘   └───────────────┘   └─────────┘  │
+ │  ┌─────────────────┐   ┌────────────────┐   ┌─────────┐ │
+ │  │ Circuit Gen     │ → │ Noise Injection│ → │ Stim    │ │
+ │  │ (Topologies)    │   │ (QDot Biased)  │   │ Engine  │ │
+ │  └─────────────────┘   └────────────────┘   └─────────┘ │
  └────────────────────────────┬────────────────────────────┘
                               ▼
  ┌─────────────────────────────────────────────────────────┐
@@ -66,8 +60,6 @@ Beyond individual code benchmarks, `qdots` functions as a robust, easily configu
     └── viz/            # Visualization and plotting scripts
 ```
 
----
-
 ## ⚡ Tech Stack & Core Dependencies
 - Simulation Core: Stim for ultra-fast stabilizer circuit simulation and Sinter for monte carlo sampling.
 - Decoding Engine: PyMatching for fast minimum-weight perfect matching (MWPM) decoding, tailored with custom weight assignments for biased noise.
@@ -80,8 +72,6 @@ Ensure you have all the required third-party dependencies installed:
 ```bash
 pip install -r requirements.txt
 ```
-
----
 
 ## Usage
 
