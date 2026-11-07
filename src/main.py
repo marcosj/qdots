@@ -48,7 +48,7 @@ def run(a: Args):
         tasks = gen_tasks(a.gen, d, p, a.rounds, a.dq, a.aq, a.rnd, a.rst, a.gate, a.meas, eta, a.mem, a.debug)
         stats = sim(tasks, csv, shots=a.shots, max_errors=a.errors, clear_history=a.reset)
     img = IMG_DIR / f'{a.fname}.svg'
-    title = a.title if a.pf else f'{a.title} (p={a.pi})'
+    title = a.title if a.pf else f'{a.title} (p={a.pi/100})'
     p_th = plot(stats, sweep=a.sweep, title=title, path=img)
     if p_th: print(f'{p_th}')
     return p_th

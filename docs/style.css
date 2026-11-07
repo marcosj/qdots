@@ -152,7 +152,17 @@ margin: 5px; /* Shaves off extra bottom space to free up room for content */
   object-fit: contain;
 }
 
-.lay:has(input.s1:checked) .top1,
+.lay {
+  &:has(input.s1:checked) .top1, &:has(input.s1:checked) .bot1,
+  &:has(input.s2:checked) .top2, &:has(input.s2:checked) .bot2,
+  &:has(input.s3:checked) .top3, &:has(input.s3:checked) .bot3,
+  &:has(input.s4:checked) .top4, &:has(input.s4:checked) .bot4,
+  &:has(input.s5:checked) .top5, &:has(input.s5:checked) .bot5 {
+    display: block !important;
+  }
+}
+
+/*.lay:has(input.s1:checked) .top1,
 .lay:has(input.s1:checked) .bot1,
 .lay:has(input.s2:checked) .top2,
 .lay:has(input.s2:checked) .bot2,
@@ -163,4 +173,4 @@ margin: 5px; /* Shaves off extra bottom space to free up room for content */
 .lay:has(input.s5:checked) .top5,
 .lay:has(input.s5:checked) .bot5 {
   display: block !important;
-}
+}*/

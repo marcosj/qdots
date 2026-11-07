@@ -146,10 +146,11 @@ def gen_xzzx_rot_mx(d, r):
     return C + P + R + D0 + Ri * (r-1) + M
 
 if __name__ == '__main__':
+    from ..conf import TMP_DIR
     sc = gen_xzzx_rot_mx(3, 1)
-    sc.to_file("xzrxcx.stim")
+    sc.to_file(TMP_DIR / "xzrxcx.stim")
     svg = sc.diagram('timeslice-svg')
-    with open("xzrxcx.svg", "w") as f:
+    with open(TMP_DIR / "xzmx.svg", "w") as f:
         f.write(str(svg))
     dem = sc.detector_error_model(decompose_errors=True)
     #print('dem\n', dem)

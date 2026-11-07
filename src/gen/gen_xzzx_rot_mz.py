@@ -149,8 +149,8 @@ if __name__ == '__main__':
     from ..conf import TMP_DIR
     sc = gen_xzzx_rot_mz(3, 1)
     sc.to_file(TMP_DIR / "xzrzcx.stim")
+    svg = sc.diagram('timeslice-svg')
+    with open(TMP_DIR / "xzmz.svg", "w") as f:
+        f.write(str(svg))
     dem = sc.detector_error_model(decompose_errors=True)
     #print('dem\n', dem)
-    svg = sc.diagram('timeslice-svg')
-    with open(TMP_DIR / "xzrzcx.svg", "w") as f:
-        f.write(str(svg))
