@@ -21,7 +21,7 @@ Developed as part of my thesis and as advanced research into quantum error corre
 Beyond individual code benchmarks, `qdots` functions as a robust, easily configurable simulation pipeline designed for high-throughput scaling and custom noise model injection:
 
 ```mermaid
-graph TD
+graph LR
     Start([Start]) --> CG[Circuit generator]
     Config[/Config/] --> CG
     CG --> NI[Noise Injection]
@@ -40,29 +40,6 @@ graph TD
     style MC fill:#161b22,stroke:#30363d,color:#c9d1d9
     style PP fill:#161b22,stroke:#30363d,color:#c9d1d9
     style An fill:#161b22,stroke:#30363d,color:#c9d1d9
-```
-
-```text
- ┌─────────────────────────────────────────────────────────┐
- │               Configuration & Parameters                │
- │    (Code Topology, Noise Bias η, Error Rates p, Rounds) │
- └────────────────────────────┬────────────────────────────┘
-                              ▼
- ┌─────────────────────────────────────────────────────────┐
- │                   Simulation Pipeline                   │
- │  ┌─────────────────┐   ┌────────────────┐   ┌─────────┐ │
- │  │ Circuit Gen     │ → │ Noise Injection│ → │ Stim    │ │
- │  │ (Topologies)    │   │ (QDot Biased)  │   │ Engine  │ │
- │  └─────────────────┘   └────────────────┘   └─────────┘ │
- └────────────────────────────┬────────────────────────────┘
-                              ▼
- ┌─────────────────────────────────────────────────────────┐
- │                   Decoding & Analysis                   │
- │       ┌───────────────────┐     ┌───────────────────┐   │
- │       │ Custom PyMatching │     │ Threshold & Error │   │
- │       │ Graph Decoders    │     │ Rate Evaluator    │   │
- │       └───────────────────┘     └───────────────────┘   │
- └─────────────────────────────────────────────────────────┘
 ```
 
 ## Repository Structure
