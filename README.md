@@ -22,17 +22,13 @@ Beyond individual code benchmarks, `qdots` functions as a robust, easily configu
 
 ```mermaid
 graph LR
-    Start([Start]) --> CG[Circuit generator]
-    Config[/Config/] --> CG
+    Config[/Config/] --> CG[Circuit generator]
     CG --> NI[Noise Injection]
     NI --> TG[Task generator]
     TG --> MC[Monte Carlo sampling]
     MC --> PP[Post processing]
     PP --> An[Analysis]
-    An --> End([End])
 
-    style Start fill:#161b22,stroke:#30363d,color:#c9d1d9
-    style End fill:#161b22,stroke:#30363d,color:#c9d1d9
     style Config fill:#161b22,stroke:#30363d,color:#c9d1d9
     style CG fill:#161b22,stroke:#30363d,color:#c9d1d9
     style NI fill:#161b22,stroke:#30363d,color:#c9d1d9
