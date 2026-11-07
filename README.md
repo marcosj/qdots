@@ -1,6 +1,53 @@
-# Quantum error correcting codes tailored to biased quantum dot noise
+# qdots: Biased-Noise-Tailored Quantum Error Correction Simulation Framework
 
-A Python-based simulation framework for analyzing thresholds and fidelities across various quantum error-correcting codes (Surface, Bacon-Shor, XZZX, and Clifford deformed Bacon-Shor codes) under code capacity, circuit-level, and real quantum dot noise models.
+A high-performance Python simulation framework engineered to benchmark and compare **Quantum Error-Correcting (QEC) codes** under realistic, biased physical noise models typical of **semiconductor spin qubits** (quantum dot architectures).
+
+---
+
+## 🔬 Core Scientific Objective
+
+The flagship goal of this repository is to rigorously compare standard CSS codes against their **XZZX-deformed variants** to determine logical error rates versus syndrome extraction rounds ($P_L$ vs. rounds), compute fault-tolerant thresholds, and evaluate performance advantages under highly asymmetric (biased) noise.
+
+### Supported Code Topologies
+- **Surface Codes** (Rotated and Unrotated)
+- **Bacon-Shor Codes** & Clifford-Deformed Bacon-Shor (CDBS) variants
+- **XZZX Surface Codes**
+- **Color Codes** (To do)
+
+---
+
+📊 Research Context & Status
+
+Developed as part of my thesis and as advanced research into quantum error correction performance scaling for semiconductor spin qubits, in collaboration with UCR and NTHU. Designed to generate reproducible benchmarking data for threshold estimation and hardware-tailored decoder design.
+
+---
+
+## 🏛️ Framework Architecture
+
+Beyond individual code benchmarks, `qdots` functions as a robust, easily configurable simulation pipeline designed for high-throughput scaling and custom noise model injection:
+
+```text
+ ┌─────────────────────────────────────────────────────────┐
+ │               Configuration & Parameters                │
+ │    (Code Topology, Noise Bias η, Error Rates p, Rounds)   │
+ └────────────────────────────┬────────────────────────────┘
+                              ▼
+ ┌─────────────────────────────────────────────────────────┐
+ │                   Simulation Pipeline                   │
+ │  ┌─────────────────┐   ┌───────────────┐   ┌─────────┐  │
+ │  │ Circuit Gen     │ → │ Noise Injection│ → │ Stim    │  │
+ │  │ (Topologies)    │   │ (QDot Biased) │   │ Engine  │  │
+ │  └─────────────────┘   └───────────────┘   └─────────┘  │
+ └────────────────────────────┬────────────────────────────┘
+                              ▼
+ ┌─────────────────────────────────────────────────────────┐
+ │                   Decoding & Analysis                   │
+ │       ┌───────────────────┐     ┌───────────────────┐   │
+ │       │ Custom PyMatching │     │ Threshold & Error │   │
+ │       │ Graph Decoders    │     │ Rate Evaluator    │   │
+ │       └───────────────────┘     └───────────────────┘   │
+ └─────────────────────────────────────────────────────────┘
+```
 
 ## Repository Structure
 
@@ -19,7 +66,14 @@ A Python-based simulation framework for analyzing thresholds and fidelities acro
     └── viz/            # Visualization and plotting scripts
 ```
 
-## Installation
+---
+
+## ⚡ Tech Stack & Core Dependencies
+- Simulation Core: Stim for ultra-fast stabilizer circuit simulation and Sinter for monte carlo sampling.
+- Decoding Engine: PyMatching for fast minimum-weight perfect matching (MWPM) decoding, tailored with custom weight assignments for biased noise.
+- Scientific Computing: NumPy, SciPy, Matplotlib for data processing and threshold curve fitting.
+
+## 🚀 Installation
 
 Ensure you have all the required third-party dependencies installed:
 
@@ -27,11 +81,13 @@ Ensure you have all the required third-party dependencies installed:
 pip install -r requirements.txt
 ```
 
-*Note: Execution through the `Makefile` automatically handles setting up your environment paths so the internal modules (`conf`, `gen`, `noi`, `sim`, `viz`) are discoverable.*
+---
 
 ## Usage
 
 The main execution script runs specific simulation configurations by passing a key identifier as an argument via the wrapper `Makefile`.
+
+*Note: Execution through the `Makefile` automatically handles setting up your environment paths so the internal modules (`conf`, `gen`, `noi`, `sim`, `viz`) are discoverable.*
 
 ### Running a Simulation
 To run a single simulation configuration, execute `make run` followed by the configuration key name:
@@ -60,4 +116,4 @@ make run sczth
 | **`zxzth`** / **`zxzfi`** | XZZX Bacon-Shor | Real Noise | Threshold or Fidelity with real noise params |
 
 ## Output
-Data and plots are automatically generated and saved to the directories configured in your environment (`CSV_DIR` and `PNG_DIR`), using unique identifiers defined by each configuration's `fname` parameter.
+Data and plots are automatically generated and saved to the directories configured in your environment (`CSV_DIR`, `PNG_DIR` and `IMG_DIR`), using unique identifiers defined by each configuration's `fname` parameter.
