@@ -20,6 +20,28 @@ Developed as part of my thesis and as advanced research into quantum error corre
 
 Beyond individual code benchmarks, `qdots` functions as a robust, easily configurable simulation pipeline designed for high-throughput scaling and custom noise model injection:
 
+```mermaid
+graph TD
+    Start([Start]) --> CG[Circuit generator]
+    Config[/Config/] --> CG
+    CG --> NI[Noise Injection]
+    NI --> TG[Task generator]
+    TG --> MC[Monte Carlo sampling]
+    MC --> PP[Post processing]
+    PP --> An[Analysis]
+    An --> End([End])
+
+    style Start fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style End fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style Config fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style CG fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style NI fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style TG fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style MC fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style PP fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style An fill:#161b22,stroke:#30363d,color:#c9d1d9
+```
+
 ```text
  ┌─────────────────────────────────────────────────────────┐
  │               Configuration & Parameters                │
